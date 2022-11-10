@@ -33,7 +33,7 @@ abstract interface Pieces {
     public void moveTo(int xx, int yy);
     
 }
-abstract class DecoratorInterface implements Pieces {
+/*abstract class DecoratorInterface implements Pieces {
 
     protected Pieces pieceDecorator;
 
@@ -57,7 +57,7 @@ abstract class DecoratorInterface implements Pieces {
         pieceDecorator.moveTo(xx, yy);
     }
     
-}
+}*/
 public class Chessboard extends JPanel {
 	public static final int ZEROX = 23;
     static final int ZEROY = 7;
