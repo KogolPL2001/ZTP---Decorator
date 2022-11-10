@@ -36,5 +36,8 @@ class Decorator implements Pieces {
         g.setTransform(saveXform);
     }
 
+    public Pieces Undecorate(){
+        return this.pieceDecorator;
+    }
     
 }

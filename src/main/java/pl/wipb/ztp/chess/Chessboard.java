@@ -16,6 +16,10 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+
+import java.awt.geom.*;
+
+
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -31,33 +35,10 @@ abstract interface Pieces {
     public int getY();
 
     public void moveTo(int xx, int yy);
-    
+
+	public Pieces Undecorate();
+
 }
-/*abstract class DecoratorInterface implements Pieces {
-
-    protected Pieces pieceDecorator;
-
-    public DecoratorInterface(Pieces pieceDecorator) {
-        this.pieceDecorator = pieceDecorator;
-    }
-
-    public void draw(Graphics2D g) {
-        pieceDecorator.draw(g);
-    }
-
-    public int getX() {
-        return pieceDecorator.getX();
-    }
-
-    public int getY() {
-        return pieceDecorator.getY();
-    }
-
-    public void moveTo(int xx, int yy) {
-        pieceDecorator.moveTo(xx, yy);
-    }
-    
-}*/
 public class Chessboard extends JPanel {
 	public static final int ZEROX = 23;
     static final int ZEROY = 7;
@@ -92,6 +73,7 @@ public class Chessboard extends JPanel {
             dragged.draw((Graphics2D) g);
         }
     }
+	public AffineTransform draggedTransform = null;
     Chessboard() {
         
         board.put(new Point(0, 2), new Decorator(new Piece(11, 0, 2)));
@@ -114,21 +96,26 @@ public class Chessboard extends JPanel {
 		}
 		setPreferredSize(new Dimension(image.getWidth(null), image.getHeight(null)));
 
+		
+
 		this.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent ev) {
 				dragged = take((ev.getX() - ZEROX) / Piece.TILESIZE, (ev.getY() - ZEROY) / Piece.TILESIZE);
+				draggedTransform = new AffineTransform();
+                dragged= new SecondDecorator(dragged,draggedTransform);
 				mouse = ev.getPoint();
 			}
 
 			public void mouseReleased(MouseEvent ev) {
-				drop(dragged, (ev.getX() - ZEROX) / Piece.TILESIZE, (ev.getY() - ZEROY) / Piece.TILESIZE);
+				drop(dragged.Undecorate(), (ev.getX() - ZEROX) / Piece.TILESIZE, (ev.getY() - ZEROY) / Piece.TILESIZE);
 				dragged = null;
 				undo.setEnabled(true);
 			}
 		});
 		this.addMouseMotionListener(new MouseMotionAdapter() {
 			public void mouseDragged(MouseEvent ev) {
-				mouse = ev.getPoint();
+				//mouse = ev.getPoint();
+				draggedTransform.setToTranslation(ev.getX() - mouse.getX(), ev.getY() - mouse.getY());
 				repaint();
 			}
 		});

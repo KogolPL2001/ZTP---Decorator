@@ -42,5 +42,8 @@ class Piece implements Pieces{
         y = yy;
     }
 	
+    public Pieces Undecorate(){
+        return null; 
+    }
     
 }
