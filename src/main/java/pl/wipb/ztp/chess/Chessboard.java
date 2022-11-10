@@ -22,57 +22,89 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
+abstract interface Pieces {
 
+    public void draw(Graphics2D g);
+
+    public int getX();
+
+    public int getY();
+
+    public void moveTo(int xx, int yy);
+    
+}
+abstract class DecoratorInterface implements Pieces {
+
+    protected Pieces pieceDecorator;
+
+    public DecoratorInterface(Pieces pieceDecorator) {
+        this.pieceDecorator = pieceDecorator;
+    }
+
+    public void draw(Graphics2D g) {
+        pieceDecorator.draw(g);
+    }
+
+    public int getX() {
+        return pieceDecorator.getX();
+    }
+
+    public int getY() {
+        return pieceDecorator.getY();
+    }
+
+    public void moveTo(int xx, int yy) {
+        pieceDecorator.moveTo(xx, yy);
+    }
+    
+}
 public class Chessboard extends JPanel {
 	public static final int ZEROX = 23;
-	static final int ZEROY = 7;
+    static final int ZEROY = 7;
 
-	private HashMap<Point, Piece> board = new HashMap<Point, Piece>();
+    private HashMap<Point, Pieces> board = new HashMap<Point, Pieces>();
 
-	public void drop(Piece p, int x, int y) {
-		repaint();
-		p.moveTo(x, y);
-		board.put(new Point(x, y), p); // jeśli na tych współrzędnych
-		// jest już jakaś figura, znika ona z planszy
-		// (HashMap nie dopuszcza powtórzeń)
-	}
+    public void drop(Pieces p, int x, int y) {
+        repaint();
+        p.moveTo(x, y);
+        board.put(new Point(x, y), p); // jeśli na tych współrzędnych
+        //jest już jakaś figura, znika ona z planszy
+        //(HashMap nie dopuszcza powtórzeń)
+    }
 
-	public Piece take(int x, int y) {
-		repaint();
-		return board.remove(new Point(x, y));
-	}
+	public Pieces take(int x, int y) {
+        repaint();
+        return board.remove(new Point(x, y));
+    }
 
 	private Image image;
-	private Piece dragged = null;
-	private Point mouse = null;
+    private Pieces dragged = null;
+    private Point mouse = null;
 
-	@Override
-	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
-		g.drawImage(image, 0, 0, null);
-		Graphics2D g2d = (Graphics2D) g;
-		for (Map.Entry<Point, Piece> e : board.entrySet()) {
-			Point pt = e.getKey();
-			Piece pc = e.getValue();
-			pc.draw(g2d);
-		}
-		if (mouse != null && dragged != null) {
-			dragged.draw(g2d);
-		}
-	}
-
-	Chessboard() {
-		board.put(new Point(0, 2), new Piece(11, 0, 2));
-		board.put(new Point(0, 6), new Piece(0, 0, 6));
-		board.put(new Point(1, 4), new Piece(6, 1, 4));
-		board.put(new Point(1, 5), new Piece(5, 1, 5));
-		board.put(new Point(3, 7), new Piece(1, 3, 7));
-		board.put(new Point(4, 3), new Piece(6, 4, 3));
-		board.put(new Point(4, 4), new Piece(7, 4, 4));
-		board.put(new Point(5, 4), new Piece(6, 5, 4));
-		board.put(new Point(5, 6), new Piece(0, 5, 6));
-		board.put(new Point(6, 5), new Piece(0, 6, 5));
-		board.put(new Point(7, 4), new Piece(0, 7, 4));
+	public void paint(Graphics g) {
+        g.drawImage(image, 0, 0, null);
+        for (Map.Entry<Point, Pieces> e : board.entrySet()) {
+            Point pt = e.getKey();
+            Pieces pc = e.getValue();
+            pc.draw((Graphics2D) g);
+        }
+        if (mouse != null && dragged != null) {
+            dragged.draw((Graphics2D) g);
+        }
+    }
+    Chessboard() {
+        
+        board.put(new Point(0, 2), new Decorator(new Piece(11, 0, 2)));
+        board.put(new Point(0, 6), new Decorator(new Piece(0, 0, 6)));
+        board.put(new Point(1, 4), new Decorator(new Piece(6, 1, 4)));
+        board.put(new Point(1, 5), new Decorator(new Piece(5, 1, 5)));
+        board.put(new Point(3, 7), new Decorator(new Piece(1, 3, 7)));
+        board.put(new Point(4, 3), new Decorator(new Piece(6, 4, 3)));
+        board.put(new Point(4, 4), new Decorator(new Piece(7, 4, 4)));
+        board.put(new Point(5, 4), new Decorator(new Piece(6, 5, 4)));
+        board.put(new Point(5, 6), new Decorator(new Piece(0, 5, 6)));
+        board.put(new Point(6, 5), new Decorator(new Piece(0, 6, 5)));
+        board.put(new Point(7, 4), new Decorator(new Piece(0, 7, 4)));
 
 		try {
 			image = loadImage("/img/board3.png");
